@@ -29,7 +29,14 @@ Abra o endereço no navegador e use **Adicionar à tela de início** (no Safari,
 2. **Novo processo:** informe o paciente, o vendedor, o médico, o convênio, o hospital e a data da solicitação. Em seguida, lance os itens com quantidade e valor unitário cotado.
 3. **Mover etapa:** use o fluxo Pedido → Cotação → Em análise (aguardando autorização) → Autorizada → Agendada → Realizada, ou marque como Negada ou Cancelada. Dá para informar a data e a hora reais da mudança.
 4. **Valores autorizados:** quando o processo for autorizado, preencha o valor unitário autorizado de cada item. Esses valores formam o histórico de preços por convênio, e o painel sugere o último valor aprovado na próxima cotação.
-5. **Relatórios:** gere um PDF por vendedor ou um PDF consolidado para a diretoria. Há a opção de mostrar só as iniciais dos pacientes (LGPD). Também é possível exportar tudo em CSV para o Excel.
+5. **Filtros e PDF da lista:** em Processos, filtre por vendedor, médico, convênio e hospital. O botão **PDF** gera o acompanhamento exatamente da lista que está na tela.
+6. **Relatório semanal para o médico:** em Relatórios, escolha o médico (ou todos, e sai um PDF para cada um), o hospital e o período dos encerrados (padrão: últimos 7 dias). O PDF traz o status ao lado de cada paciente, os dias corridos desde a solicitação até a data do relatório, o tempo na etapa, a data da cirurgia, o nº da guia e o valor autorizado, com o total.
+7. **Portais:** guarde o link, o usuário e a senha dos portais de cada hospital e operadora. As senhas são criptografadas no seu aparelho com a **senha do cofre** antes de irem para o banco. Se você esquecer a senha do cofre, as senhas guardadas não têm como ser recuperadas: será preciso redefinir o cofre e cadastrá-las de novo.
+8. **Relatórios:** gere um PDF por vendedor ou um PDF consolidado para a diretoria. Há a opção de mostrar só as iniciais dos pacientes (LGPD). Também é possível exportar tudo em CSV para o Excel.
+
+## Dados de demonstração
+
+O banco começa com processos, médicos, hospitais e portais **fictícios**, marcados como demonstração. Enquanto eles existirem, aparece uma faixa amarela no topo do painel. Para começar de verdade, clique em **Apagar dados fictícios**. Só os dados de exemplo são removidos.
 
 ## Prazos
 

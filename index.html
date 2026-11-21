@@ -120,7 +120,7 @@ main{min-width:0;padding:0 28px 48px}
   .top h2{font-family:'Space Grotesk';font-size:17px;color:var(--tx);font-weight:600}
   .sync span{display:none}
   .top .btn-novo-txt{display:none}
-  .bottom{display:grid;grid-template-columns:repeat(6,1fr);position:fixed;bottom:0;left:0;right:0;background:rgba(14,20,31,.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px 2px calc(6px + env(safe-area-inset-bottom));z-index:40}
+  .bottom{display:grid;grid-template-columns:repeat(7,1fr);position:fixed;bottom:0;left:0;right:0;background:rgba(14,20,31,.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px 2px calc(6px + env(safe-area-inset-bottom));z-index:40}
   .bottom a{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--mut);padding:5px 0;cursor:pointer}
   .bottom a.on{color:var(--brand)}
   .bottom svg.i{width:21px;height:21px}
@@ -320,6 +320,31 @@ table.tbl{width:100%;border-collapse:collapse;font-size:13px}
 #loading[hidden]{display:none}
 .spin{width:38px;height:38px;border-radius:50%;border:3px solid var(--line2);border-top-color:var(--brand);animation:sp 0.8s linear infinite;margin:0 auto 14px}
 @keyframes sp{to{transform:rotate(360deg)}}
+
+/* demonstração */
+.demo-bar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:linear-gradient(90deg,rgba(251,191,36,.13),rgba(251,191,36,.04));border:1px solid rgba(251,191,36,.35);color:#FDE68A;border-radius:12px;padding:10px 14px;margin:2px 0 16px;font-size:12.5px;line-height:1.45}
+.demo-bar>div{flex:1;min-width:200px}
+.demo-bar b{color:#FEF3C7}
+/* portais / cofre */
+.vault{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px;margin-bottom:14px}
+.vault .ico{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:rgba(34,211,238,.1);color:var(--brand);flex:none}
+.vault .grow{flex:1;min-width:220px;font-size:13.5px}
+.vault .grow .mut{margin-top:3px;line-height:1.5}
+.vault.on{border-color:rgba(52,211,153,.35)}
+.vault form{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.vault form .inp{width:200px}
+@media(max-width:640px){.vault form{width:100%}.vault form .inp{flex:1;width:auto;min-width:0}}
+.pt{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px;display:flex;flex-direction:column;gap:9px}
+.pt-h{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.pt-n{font-weight:600;font-size:14.5px;display:flex;align-items:center;gap:8px}
+.pt-s{font-size:12px;color:var(--mut);margin-top:3px}
+.cred{display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:5px 5px 5px 12px;min-height:42px}
+.cred>span{font-size:10.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em;width:56px;flex:none}
+.cred code{flex:1;min-width:0;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.cred code i{font-family:Inter,sans-serif;font-style:normal;font-size:12px;color:var(--mut2)}
+.pt-o{font-size:12px;color:var(--mut);line-height:1.5;white-space:pre-wrap}
+.pt .btn{align-self:flex-start}
+.tagdemo{font-size:10px;font-weight:600;color:#FCD34D;background:rgba(251,191,36,.13);padding:2px 7px;border-radius:6px;letter-spacing:.03em}
 </style>
 </head>
 <body>
@@ -402,6 +427,7 @@ const PAGES = [
   {k:'ranking',    t:'Ranking',    i:'trophy'},
   {k:'precos',     t:'Preços',     i:'tag'},
   {k:'relatorios', t:'Relatórios', i:'file'},
+  {k:'portais',    t:'Portais',    i:'key'},
   {k:'cadastros',  t:'Cadastros',  i:'db'},
 ];
 
@@ -410,11 +436,13 @@ const PAGES = [
    ========================================================= */
 const S = {
   user:null, page:'painel', lmode:'login',
-  db:{vendedores:[],medicos:[],convenios:[],hospitais:[],produtos:[],feriados:[],processos:[],itens:[],historico:[],acesso:[]},
+  db:{vendedores:[],medicos:[],convenios:[],hospitais:[],produtos:[],feriados:[],processos:[],itens:[],historico:[],acesso:[],portais:[],cofre:[]},
   P:[],
   filtro:{periodo:'mes',ini:'',fim:'',vendedor:''},
-  rel:{periodo:'mes',ini:'',fim:'',vendedor:'',iniciais:false,encerrados:true},
-  proc:{busca:'',status:'abertos',vendedor:'',medico:'',convenio:'',view:'lista',ordem:'urgencia'},
+  relm:{periodo:'7d',ini:'',fim:''},
+  rel:{periodo:'mes',ini:'',fim:'',vendedor:'',medico:'',hospital:'',iniciais:false,encerrados:true},
+  proc:{busca:'',status:'abertos',vendedor:'',medico:'',convenio:'',hospital:'',view:'lista',ordem:'urgencia'},
+  port:{busca:'',hospital:''},
   rank:{tab:'vendedores',ordem:'vAut'},
   preco:{busca:'',convenio:''},
   cad:{tab:'vendedores'},
@@ -434,6 +462,11 @@ const IC = {
   tag:'M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8zM7.5 7.5h.01',
   file:'M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 13h8M8 17h5',
   db:'M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6',
+  key:'M21 2l-2 2m-7.6 7.6a5.5 5.5 0 1 1-7.8 7.8 5.5 5.5 0 0 1 7.8-7.8zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4',
+  lock:'M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4', unlock:'M5 11h14v10H5zM8 11V7a4 4 0 0 1 7.8-1.2',
+  eye:'M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12zM12 9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z',
+  copy:'M9 9h11v11H9zM5 15H4V4h11v1', ext:'M14 3h7v7M10 14L21 3M19 14v6a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h6',
+  hosp:'M4 21V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v16M2 21h20M12 7v6M9 10h6M9 21v-4h6v4',
   plus:'M12 5v14M5 12h14', x:'M6 6l12 12M18 6L6 18',
   dl:'M12 3v12M7 10l5 5 5-5M5 21h14',
   search:'M11 4a7 7 0 1 0 0 14 7 7 0 0 0 0-14zM21 21l-4.3-4.3',
@@ -524,10 +557,11 @@ async function fetchAll(table, order){
   return out;
 }
 async function loadCad(){
-  const [v,m,c,h,p,f,a]=await Promise.all([
+  const safe=t=>fetchAll(t).catch(()=>[]);
+  const [v,m,c,h,p,f,a,pt,cf]=await Promise.all([
     fetchAll('vendedores','nome'),fetchAll('medicos','nome'),fetchAll('convenios','nome'),
-    fetchAll('hospitais','nome'),fetchAll('produtos','descricao'),fetchAll('feriados','data'),fetchAll('acesso','email')]);
-  Object.assign(S.db,{vendedores:v,medicos:m,convenios:c,hospitais:h,produtos:p,feriados:f,acesso:a});
+    fetchAll('hospitais','nome'),fetchAll('produtos','descricao'),fetchAll('feriados','data'),fetchAll('acesso','email'),safe('portais'),safe('cofre')]);
+  Object.assign(S.db,{vendedores:v,medicos:m,convenios:c,hospitais:h,produtos:p,feriados:f,acesso:a,portais:pt,cofre:cf});
 }
 async function loadProc(){
   const [p,i,h]=await Promise.all([fetchAll('processos','id'),fetchAll('processo_itens','id'),fetchAll('processo_historico','id')]);
@@ -583,6 +617,7 @@ const getP = id => S.P.find(x=>x.id===id);
 function rangePeriodo(f){
   const n=new Date(), y=n.getFullYear(), m=n.getMonth(); let ini=null, fim=null;
   switch(f.periodo){
+    case '7d': ini=new Date(y,m,n.getDate()-6); break;
     case 'mes': ini=new Date(y,m,1); break;
     case 'mesant': ini=new Date(y,m-1,1); fim=new Date(y,m,0); break;
     case '3m': ini=new Date(y,m-2,1); break;
@@ -593,7 +628,7 @@ function rangePeriodo(f){
   return {ini,fim};
 }
 const noPeriodo = (e,r) => (!r.ini||e.dSol>=r.ini) && (!r.fim||e.dSol<=r.fim);
-const PERIODOS = [['mes','Este mês'],['mesant','Mês passado'],['3m','Últimos 3 meses'],['6m','Últimos 6 meses'],['ano','Este ano'],['tudo','Todo o período'],['custom','Personalizado']];
+const PERIODOS = [['7d','Últimos 7 dias'],['mes','Este mês'],['mesant','Mês passado'],['3m','Últimos 3 meses'],['6m','Últimos 6 meses'],['ano','Este ano'],['tudo','Todo o período'],['custom','Personalizado']];
 function labelPeriodo(f){ if(f.periodo==='custom'){ const r=rangePeriodo(f); return `${r.ini?fmtD(r.ini):'início'} a ${r.fim?fmtD(r.fim):'hoje'}`; } return (PERIODOS.find(p=>p[0]===f.periodo)||[])[1]||''; }
 function rangeTxt(f){ const r=rangePeriodo(f); return `${r.ini?fmtD(r.ini):'início dos registros'} a ${fmtD(r.fim||new Date())}`; }
 function periodoHTML(f,fn){
@@ -628,6 +663,10 @@ function rankVend(list){
 function rankMed(list){
   const M=byId(S.db.medicos);
   return agrupar(list,'medico_id',id=>M.get(id)?.nome||'Sem médico').filter(x=>x.list.length);
+}
+function rankHosp(list){
+  const H=byId(S.db.hospitais);
+  return agrupar(list,'hospital_id',id=>H.get(id)?.nome||'Sem hospital').filter(x=>x.list.length);
 }
 function rankConv(list){
   const C=byId(S.db.convenios);
@@ -750,6 +789,7 @@ let rtTimer=null, lastCad=Date.now();
 function assinar(){
   const ch=sb.channel('neurox-db');
   ['processos','processo_itens','processo_historico'].forEach(t=>ch.on('postgres_changes',{event:'*',schema:'public',table:t},agendarRecarga));
+  ch.on('postgres_changes',{event:'*',schema:'public',table:'portais'},()=>{ clearTimeout(window._rp); window._rp=setTimeout(async()=>{ try{ S.db.portais=await fetchAll('portais'); if(S.page==='portais'&&!MODAL) renderView(); }catch(e){} },600); });
   ch.subscribe(st=>{ const on=st==='SUBSCRIBED'; $('#sync').classList.toggle('on',on); $('#sync span').textContent=on?'Sincronizado':'Reconectando…'; });
 }
 function agendarRecarga(){ clearTimeout(rtTimer); rtTimer=setTimeout(async()=>{ try{ await loadProc(); refreshAll(true); }catch(e){} },500); }
@@ -772,13 +812,23 @@ function renderNav(){
   $('#snav').innerHTML=h; $('#bnav').innerHTML=h;
 }
 function go(p){ S.page=p; history.replaceState(null,'','#'+p); renderNav(); renderView(); window.scrollTo(0,0); }
-const PG = {painel:pgPainel,processos:pgProcessos,ranking:pgRanking,precos:pgPrecos,relatorios:pgRelatorios,cadastros:pgCadastros};
+const PG = {painel:pgPainel,processos:pgProcessos,ranking:pgRanking,precos:pgPrecos,relatorios:pgRelatorios,portais:pgPortais,cadastros:pgCadastros};
 function renderView(){
   Object.values(S.charts).forEach(c=>{try{c.destroy()}catch(e){}}); S.charts={};
   $('#ptitle').textContent=PAGES.find(p=>p.k===S.page).t;
   const r=PG[S.page]();
-  $('#view').innerHTML=r.html;
+  $('#view').innerHTML=demoBar()+r.html;
   r.after && r.after();
+}
+function demoBar(){
+  const n=S.db.processos.filter(p=>p.demo).length, np=S.db.portais.filter(p=>p.demo).length;
+  if(!n&&!np) return '';
+  return `<div class="demo-bar">${ic('alert')}<div><b>Modo demonstração.</b> ${n} ${plural(n,'processo','processos')}${np?` e ${np} ${plural(np,'portal','portais')}`:''} com dados fictícios, só para você conhecer o painel. Quando for começar de verdade, apague com um clique.</div><button class="btn gho sm" onclick="limparDemo()">${ic('trash')}Apagar dados fictícios</button></div>`;
+}
+async function limparDemo(){
+  if(!confirm('Apagar todos os dados fictícios (processos, portais e cadastros de demonstração)? Os dados reais que você cadastrou não são afetados.')) return;
+  const {data,error}=await sb.rpc('limpar_demo'); if(error) return erro(error);
+  await loadAll(); renderView(); toast(`Dados fictícios apagados (${data?.processos??0} processos)`,'ok');
 }
 function setupCharts(){
   Chart.defaults.color='#8C99AE'; Chart.defaults.borderColor='#1C2536';
@@ -878,6 +928,7 @@ function filtrarProc(ignStatus){
     if(q.vendedor&&String(e.vendedor_id)!==q.vendedor) return false;
     if(q.medico&&String(e.medico_id)!==q.medico) return false;
     if(q.convenio&&String(e.convenio_id)!==q.convenio) return false;
+    if(q.hospital&&String(e.hospital_id)!==q.hospital) return false;
     if(b&&!norm([e.paciente_nome,e.procedimento,e.medNome,e.convNome,e.hospNome,e.vendNome,e.numero_guia,e.paciente_carteirinha,'#'+e.id].join(' ')).includes(b)) return false;
     if(!ignStatus){
       if(q.status==='abertos'&&!e.aberto) return false;
@@ -924,7 +975,9 @@ function pgProcessos(){
     <select class="inp sm sel" onchange="setProc('vendedor',this.value)">${opts(S.db.vendedores,q.vendedor,'Vendedor: todos')}</select>
     <select class="inp sm sel" onchange="setProc('medico',this.value)">${opts(S.db.medicos,q.medico,'Médico: todos')}</select>
     <select class="inp sm sel" onchange="setProc('convenio',this.value)">${opts(S.db.convenios,q.convenio,'Convênio: todos')}</select>
+    <select class="inp sm sel" onchange="setProc('hospital',this.value)">${opts(S.db.hospitais,q.hospital,'Hospital: todos')}</select>
     ${q.view==='lista'?`<select class="inp sm sel" onchange="setProc('ordem',this.value)">${Object.entries(ORD_PROC).map(([k,v])=>`<option value="${k}" ${q.ordem===k?'selected':''}>${v[0]}</option>`).join('')}</select>`:''}
+    <button class="btn gho sm" title="Gerar PDF de acompanhamento com os processos desta lista" onclick="pdfLista()">${ic('dl')}PDF</button>
     <div class="seg"><button class="${q.view==='lista'?'on':''}" title="Lista" onclick="setProc('view','lista')">${ic('list')}</button><button class="${q.view==='quadro'?'on':''}" title="Quadro por etapa" onclick="setProc('view','quadro')">${ic('cols')}</button></div>
   </div>
   <div class="chips" id="pchips"></div>
@@ -1167,15 +1220,15 @@ async function quickAdd(tabela,selId){
    ========================================================= */
 function pgRanking(){
   const f=S.filtro, r=rangePeriodo(f), list=S.P.filter(e=>noPeriodo(e,r)), t=S.rank.tab;
-  const rows=ordenarRank(t==='vendedores'?rankVend(list):t==='medicos'?rankMed(list):rankConv(list),S.rank.ordem);
+  const rows=ordenarRank(t==='vendedores'?rankVend(list):t==='medicos'?rankMed(list):t==='hospitais'?rankHosp(list):rankConv(list),S.rank.ordem);
   const V=byId(S.db.vendedores);
   const extra=x=>{ if(t!=='medicos') return ''; const c=group(x.list,'vendedor_id'); const top=[...c].sort((a,b)=>b[1].length-a[1].length)[0]; return `<td>${top?esc(V.get(top[0])?.nome||'—'):'—'}</td>`; };
   const html=`
   <div class="phead"><div><h1>Ranking</h1><p class="mut">${labelPeriodo(f)} · pedidos pela data de solicitação</p></div>
     <div class="filters">${periodoHTML(f,'setFiltro')}<select class="inp sm" onchange="S.rank.ordem=this.value;renderView()">${Object.entries(ORDENS).map(([k,v])=>`<option value="${k}" ${S.rank.ordem===k?'selected':''}>Ordenar: ${v[0]}</option>`).join('')}</select></div></div>
-  <div class="ctabs">${[['vendedores','Vendedores'],['medicos','Médicos'],['convenios','Convênios']].map(x=>`<button class="chip ${t===x[0]?'on':''}" onclick="S.rank.tab='${x[0]}';renderView()">${x[1]}</button>`).join('')}</div>
+  <div class="ctabs">${[['vendedores','Vendedores'],['medicos','Médicos'],['hospitais','Hospitais'],['convenios','Convênios']].map(x=>`<button class="chip ${t===x[0]?'on':''}" onclick="S.rank.tab='${x[0]}';renderView()">${x[1]}</button>`).join('')}</div>
   <div class="card" style="margin-bottom:16px"><div class="chart-box" style="height:${Math.max(220,Math.min(rows.length,10)*38+60)}px"><canvas id="ch_rank"></canvas></div></div>
-  <div class="card"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>${t==='vendedores'?'Vendedor':t==='medicos'?'Médico':'Convênio'}</th>${t==='medicos'?'<th>Vendedor principal</th>':''}<th class="num">Pedidos</th><th class="num">Em aberto</th><th class="num">Autorizadas</th><th class="num">Realizadas</th><th class="num">Negadas</th><th class="num">Taxa aut.</th><th class="num">Conversão</th><th class="num">Valor cotado</th><th class="num">Valor autorizado</th><th class="num">Até autorizar</th><th class="num">Ciclo</th>${t==='vendedores'?'<th></th>':''}</tr></thead>
+  <div class="card"><div class="tbl-wrap"><table class="tbl"><thead><tr><th>#</th><th>${{vendedores:'Vendedor',medicos:'Médico',hospitais:'Hospital',convenios:'Convênio'}[t]}</th>${t==='medicos'?'<th>Vendedor principal</th>':''}<th class="num">Pedidos</th><th class="num">Em aberto</th><th class="num">Autorizadas</th><th class="num">Realizadas</th><th class="num">Negadas</th><th class="num">Taxa aut.</th><th class="num">Conversão</th><th class="num">Valor cotado</th><th class="num">Valor autorizado</th><th class="num">Até autorizar</th><th class="num">Ciclo</th>${t==='vendedores'?'<th></th>':''}</tr></thead>
   <tbody>${rows.length?rows.map((x,i)=>`<tr><td>${medalha(i)}</td><td><b>${esc(x.nome)}</b></td>${extra(x)}<td class="num">${x.st.n}</td><td class="num">${x.st.abertos}</td><td class="num">${x.st.aut}</td><td class="num">${x.st.real}</td><td class="num">${x.st.neg}</td><td class="num">${pct(x.st.taxaAut)}</td><td class="num">${pct(x.st.conv)}</td><td class="num">${brl(x.st.vCot)}</td><td class="num"><b>${brl(x.st.vAut)}</b></td><td class="num">${x.st.tAut!=null?num(x.st.tAut)+' d.u.':'—'}</td><td class="num">${x.st.tCiclo!=null?num(x.st.tCiclo)+' d.u.':'—'}</td>${t==='vendedores'?`<td>${x.id?`<button class="btn gho sm" onclick="pdfVendedor(${x.id},S.filtro,{iniciais:false,encerrados:true})">${ic('dl')}PDF</button>`:''}</td>`:''}</tr>`).join(''):`<tr><td colspan="15" class="empty">Sem dados no período.</td></tr>`}</tbody></table></div></div>`;
   return {html, after(){
     const top=rows.slice(0,10);
@@ -1212,6 +1265,7 @@ function pgPrecos(){
    PÁGINA: RELATÓRIOS
    ========================================================= */
 function setRel(k,v){ S.rel[k]=v; renderView(); }
+function setRelM(k,v){ S.relm[k]=v; renderView(); }
 function pgRelatorios(){
   const R=S.rel;
   const html=`
@@ -1222,16 +1276,34 @@ function pgRelatorios(){
       <label class="chk"><input type="checkbox" ${R.iniciais?'checked':''} onchange="S.rel.iniciais=this.checked">Mostrar só as iniciais dos pacientes (LGPD)</label>
       <label class="chk"><input type="checkbox" ${R.encerrados?'checked':''} onchange="S.rel.encerrados=this.checked">Incluir processos encerrados no período</label>
     </div></div></div>
-  <div class="grid3">
+  <div class="grid2">
     <div class="card rcard"><div class="ico">${ic('user')}</div><h3>Relatório do vendedor</h3><p>Indicadores do vendedor e o status de cada processo em aberto: etapa, tempo na etapa, dias úteis desde o pedido, prazo limite e valores.</p>
       <select class="inp" id="rel_v">${opts(S.db.vendedores,R.vendedor,'Todos os vendedores (um PDF cada)')}</select>
       <button class="btn pri" onclick="gerarRelVend()">${ic('dl')}Gerar PDF</button></div>
+    <div class="card rcard"><div class="ico" style="background:rgba(45,212,191,.12);color:#5EEAD4">${ic('steth')}</div><h3>Acompanhamento semanal para o médico</h3><p>Status de cada paciente ao lado do nome, dias desde a solicitação até hoje, tempo na etapa, data da cirurgia, nº da guia e valor autorizado, com o total. Traz todos os processos em andamento e os encerrados no período escolhido.</p>
+      <label class="f"><span>Encerrados a incluir</span>${periodoHTML(S.relm,'setRelM')}</label>
+      <div class="fgrid"><select class="inp" id="rel_m">${opts(S.db.medicos,R.medico,'Todos os médicos (um PDF cada)')}</select><select class="inp" id="rel_h">${opts(S.db.hospitais,R.hospital,'Todos os hospitais')}</select></div>
+      <button class="btn pri" onclick="gerarRelMed()">${ic('dl')}Gerar PDF</button></div>
     <div class="card rcard"><div class="ico" style="background:rgba(139,92,246,.12);color:#A78BFA">${ic('trend')}</div><h3>Relatório da diretoria</h3><p>Visão consolidada: KPIs, funil, evolução mensal, ranking de vendedores, médicos e convênios, tempos por etapa e processos com prazo vencido.</p>
       <div style="flex:1"></div><button class="btn pri" onclick="pdfDiretoria(S.rel,{iniciais:S.rel.iniciais})">${ic('dl')}Gerar PDF</button></div>
     <div class="card rcard"><div class="ico" style="background:rgba(52,211,153,.12);color:#6EE7B7">${ic('sheet')}</div><h3>Exportar planilha</h3><p>Todos os processos com tempos, prazos e valores em CSV — abre direto no Excel ou Google Sheets.</p>
       <div style="flex:1"></div><button class="btn gho" onclick="exportCSV()">${ic('dl')}Baixar CSV</button></div>
   </div>`;
   return {html};
+}
+async function gerarRelMed(){
+  const m=$('#rel_m').value, h=$('#rel_h').value; S.rel.medico=m; S.rel.hospital=h;
+  const r=rangePeriodo(S.relm), Hn=h?S.db.hospitais.find(x=>x.id===+h)?.nome:null;
+  const fimNo=e=>{ if(!e.dFim) return false; const d=sod(e.dFim); return (!r.ini||d>=r.ini)&&(!r.fim||d<=r.fim); };
+  const meds=m?S.db.medicos.filter(x=>x.id===+m):S.db.medicos.filter(x=>x.ativo);
+  let n=0;
+  for(const md of meds){
+    const list=S.P.filter(e=>e.medico_id===md.id&&(!h||e.hospital_id===+h)&&(e.aberto||fimNo(e)));
+    if(!list.length) continue;
+    pdfAcomp(list,{titulo:md.nome,sub:[Hn,`processos em andamento e encerrados (${labelPeriodo(S.relm).toLowerCase()})`].filter(Boolean).join(' · '),header:'Médico: '+md.nome,arq:md.nome+(Hn?'_'+Hn:''),o:{iniciais:S.rel.iniciais}});
+    n++; if(meds.length>1) await new Promise(res=>setTimeout(res,700));
+  }
+  if(!n) toast('Nenhum processo encontrado para esse filtro','bad');
 }
 async function gerarRelVend(){
   const v=$('#rel_v').value; S.rel.vendedor=v;
@@ -1283,7 +1355,7 @@ function pdfKpis(doc,y,items,cols){
   });
   return y+Math.ceil(items.length/cols)*(h+g)+4;
 }
-const PZ_COR={'Vencido':[[254,226,226],[185,28,28]],'Atenção':[[254,243,199],[146,64,14]],'No prazo':[[220,252,231],[22,101,52]],'Realizada no prazo':[[220,252,231],[22,101,52]],'Fora do prazo':[[254,226,226],[185,28,28]]};
+const PZ_COR={'Pedido recebido':[[241,245,249],[71,85,105]],'Cotação enviada':[[219,234,254],[29,78,216]],'Em análise':[[254,243,199],[146,64,14]],'Autorizada':[[204,251,241],[15,118,110]],'Agendada':[[237,233,254],[109,40,217]],'Realizada':[[220,252,231],[22,101,52]],'Negada':[[254,226,226],[185,28,28]],'Cancelada':[[243,244,246],[75,85,99]],'Vencido':[[254,226,226],[185,28,28]],'Atenção':[[254,243,199],[146,64,14]],'No prazo':[[220,252,231],[22,101,52]],'Realizada no prazo':[[220,252,231],[22,101,52]],'Fora do prazo':[[254,226,226],[185,28,28]]};
 function pdfTab(doc,y,head,body,o={}){
   const {H}=pdim(doc); if(y>H-40){ doc.addPage(); y=34; }
   doc.autoTable(Object.assign({
@@ -1291,7 +1363,7 @@ function pdfTab(doc,y,head,body,o={}){
     styles:{font:'helvetica',fontSize:7.6,cellPadding:1.9,textColor:[30,41,59],lineColor:[226,232,240],lineWidth:.15,overflow:'linebreak'},
     headStyles:{fillColor:[17,24,39],textColor:255,fontStyle:'bold',fontSize:7.4},
     alternateRowStyles:{fillColor:[248,250,252]},
-    didParseCell:d=>{ if(d.section!=='body') return; const c=PZ_COR[d.cell.raw]; if(c){ d.cell.styles.fillColor=c[0]; d.cell.styles.textColor=c[1]; d.cell.styles.fontStyle='bold'; } }
+    didParseCell:d=>{ if(d.section!=='body') return; const c=PZ_COR[d.cell.raw]||PZ_COR[pdfT(d.cell.raw)]; if(c){ d.cell.styles.fillColor=c[0]; d.cell.styles.textColor=c[1]; d.cell.styles.fontStyle='bold'; } }
   },o));
   return doc.lastAutoTable.finalY+8;
 }
@@ -1324,6 +1396,43 @@ function pdfVendedor(vid,f,o){
     pdfFinal(doc,'Relatório de processos do vendedor',`Vendedor: ${v.nome}`);
     doc.save(`Neurox_${slug(v.nome)}_${ymd(new Date())}.pdf`);
     toast('PDF gerado: '+v.nome,'ok');
+  }catch(e){ erro(e); }
+}
+function pdfLista(){
+  const q=S.proc, list=(q.view==='quadro'?filtrarProc(true):filtrarProc(false));
+  if(!list.length) return toast('Nenhum processo nesta lista','bad');
+  const nome=(t,id)=>id?S.db[t].find(x=>String(x.id)===id)?.nome:null;
+  const med=nome('medicos',q.medico), hos=nome('hospitais',q.hospital), conv=nome('convenios',q.convenio), ven=nome('vendedores',q.vendedor);
+  const stTxt=q.view==='quadro'?'Todas as etapas':({abertos:'Processos em andamento',alertas:'Processos com prazo em risco',todos:'Todos os processos'}[q.status]||('Etapa: '+ST[q.status].l));
+  const titulo=med||hos||conv||ven||'Acompanhamento de processos';
+  const sub=[stTxt, med&&hos, (med||hos)&&conv, (med||hos||conv)&&ven?'Vendedor: '+ven:null, q.busca?`Busca: "${q.busca}"`:null].filter(Boolean).join(' · ');
+  pdfAcomp(list,{titulo,sub,header:med?'Médico: '+med:hos?'Hospital: '+hos:conv?'Convênio: '+conv:ven?'Vendedor: '+ven:'Lista de processos',arq:[med,hos,conv,ven].filter(Boolean).join('_')||'processos',o:{iniciais:S.rel.iniciais}});
+}
+function pdfAcomp(list,cfg){
+  try{
+    const o=cfg.o||{}, hoje=new Date();
+    const ordem=e=>e.aberto?FLUXO.indexOf(e.status):-1;
+    const rows=list.slice().sort((a,b)=>(ordem(b)-ordem(a))||(a.dSol-b.dSol));
+    const c=k=>list.filter(e=>e.status===k).length;
+    const totAut=sum(list,e=>e.vAut);
+    const dias=e=>Math.max(0,Math.round((sod(hoje)-sod(e.dSol))/864e5));
+    const doc=pdfNovo('landscape'); let y=34;
+    doc.setFont('helvetica','bold'); doc.setFontSize(15); doc.setTextColor(15,23,42); doc.text(pdfT(cfg.titulo),12,y);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(100,116,139); doc.text(pdfT(`${cfg.sub?cfg.sub+' · ':''}status em ${fmtD(hoje)}`),12,y+5.5);
+    y=pdfKpis(doc,y+10,[['Pacientes no relatório',String(list.length)],['Em cotação / análise',String(c('pedido')+c('cotacao')+c('analise'))],['Autorizadas a agendar',String(c('autorizada'))],['Agendadas',String(c('agendada'))],['Realizadas',String(c('realizada'))],['Negadas / canceladas',String(c('negada')+c('cancelada'))],['Valor total autorizado',brl(totAut)]],7);
+    y=pdfSec(doc,y,`Status por paciente (${rows.length})`);
+    y=pdfTab(doc,y,['Paciente','Status','Dias desde a solicitação','Solicitação','Procedimento','Hospital','Convênio','Na etapa atual','Cirurgia','Nº guia / senha','Valor autorizado'],
+      rows.map(e=>[pac(e,o),ST[e.status].l,dias(e)+' '+plural(dias(e),'dia','dias'),fmtD(e.dSol),e.procedimento||'-',e.hospital_id?e.hospNome:'-',e.convNome,
+        e.aberto?durTxt(e.dcEtapa):'-',
+        e.data_realizada?'Realizada '+fmtD(parseD(e.data_realizada)):e.data_agendada?'Agendada '+fmtD(parseD(e.data_agendada)):'-',
+        e.numero_guia||'-',e.temAut?brl(e.vAut):'-']),
+      {foot:[['Total','','','','','','','','','',brl(totAut)].map(pdfT)],showFoot:'lastPage',
+       footStyles:{fillColor:[241,245,249],textColor:[15,23,42],fontStyle:'bold',fontSize:8},
+       columnStyles:{0:{fontStyle:'bold'},1:{halign:'center'},2:{halign:'center'},10:{halign:'right'}}});
+    pdfNota(doc,y,`"Dias desde a solicitação" = dias corridos entre a data do pedido e ${fmtD(hoje)}, data deste relatório. "Na etapa atual" = há quanto tempo o processo está no status mostrado. Valor autorizado = soma dos itens aprovados pelo convênio.`);
+    pdfFinal(doc,'Acompanhamento de pacientes - OPME',cfg.header||'');
+    doc.save(`Neurox_acompanhamento_${slug(cfg.arq||cfg.titulo)}_${ymd(hoje)}.pdf`);
+    toast('PDF gerado: '+cfg.titulo,'ok');
   }catch(e){ erro(e); }
 }
 function chartImg(cfg,w=1000,h=330){
@@ -1365,6 +1474,11 @@ function pdfDiretoria(f,o){
     y=pdfTab(doc,y,['Convênio','Pedidos','Autoriz.','Negadas','Taxa de autorização','Valor autorizado','Até autorizar'],
       rc.map(x=>[x.nome,String(x.st.n),String(x.st.aut),String(x.st.neg),pct(x.st.taxaAut),brl(x.st.vAut),x.st.tAut!=null?num(x.st.tAut)+' d.u.':'-']),
       {columnStyles:{1:{halign:'right'},2:{halign:'right'},3:{halign:'right'},4:{halign:'right'},5:{halign:'right'},6:{halign:'right'}}});
+    y=pdfSec(doc,y,'Desempenho por hospital');
+    const rh=ordenarRank(rankHosp(per),'n');
+    y=pdfTab(doc,y,['Hospital','Pedidos','Autoriz.','Realiz.','Negadas','Valor autorizado','Ciclo médio'],
+      rh.map(x=>[x.nome,String(x.st.n),String(x.st.aut),String(x.st.real),String(x.st.neg),brl(x.st.vAut),x.st.tCiclo!=null?num(x.st.tCiclo)+' d.u.':'-']),
+      {columnStyles:{1:{halign:'right'},2:{halign:'right'},3:{halign:'right'},4:{halign:'right'},5:{halign:'right'},6:{halign:'right'}}});
     y=pdfSec(doc,y,'Tempos e movimentos por etapa');
     const th=tempoEtapas(per);
     y=pdfTab(doc,y,['Etapa','Passagens concluídas','Média (dias úteis)','Média (dias corridos)','Em aberto agora','Parados há (média)'],
@@ -1386,6 +1500,131 @@ function exportCSV(){
   const q=v=>{ const s=v==null?'':String(v); return /[;"\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s; };
   const csv='\ufeff'+[cols,...rows].map(r=>r.map(q).join(';')).join('\r\n');
   const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})); a.download=`Neurox_processos_${ymd(new Date())}.csv`; a.click(); setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+
+/* =========================================================
+   PÁGINA: PORTAIS (cofre de senhas criptografadas no navegador)
+   ========================================================= */
+const VAULT={key:null,timer:null,show:new Set()};
+const VERIF='neurox-cofre-ok';
+const enc8=new TextEncoder(), dec8=new TextDecoder();
+const b64e=buf=>{ const u=new Uint8Array(buf); let s=''; for(let i=0;i<u.length;i++) s+=String.fromCharCode(u[i]); return btoa(s); };
+const b64d=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function vDerive(pass,salt){
+  const base=await crypto.subtle.importKey('raw',enc8.encode(pass),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt:b64d(salt),iterations:310000,hash:'SHA-256'},base,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+async function vEnc(key,txt){ const iv=crypto.getRandomValues(new Uint8Array(12)); const ct=await crypto.subtle.encrypt({name:'AES-GCM',iv},key,enc8.encode(txt)); return 'v1:'+b64e(iv)+':'+b64e(ct); }
+async function vDec(key,s){ const [,iv,ct]=String(s).split(':'); return dec8.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b64d(iv)},key,b64d(ct))); }
+function vArm(){ clearTimeout(VAULT.timer); VAULT.timer=setTimeout(()=>vLock(true),15*60*1000); }
+function vLock(auto){ VAULT.key=null; VAULT.show.clear(); clearTimeout(VAULT.timer); if(S.page==='portais'&&!MODAL) renderView(); if(auto) toast('Cofre bloqueado por inatividade'); }
+function vNeed(){ toast('Desbloqueie o cofre primeiro','bad'); const i=$('#v_pass')||$('#v_p1'); if(i){ i.focus(); i.scrollIntoView({block:'center'}); } }
+async function vCreate(ev){
+  ev.preventDefault();
+  const a=$('#v_p1').value, b=$('#v_p2').value;
+  if(a.length<8) { toast('Use pelo menos 8 caracteres','bad'); return false; }
+  if(a!==b) { toast('As senhas não conferem','bad'); return false; }
+  try{
+    const salt=b64e(crypto.getRandomValues(new Uint8Array(16))), key=await vDerive(a,salt), verificador=await vEnc(key,VERIF);
+    const {error}=await sb.from('cofre').insert({id:1,salt,verificador}); if(error) throw error;
+    S.db.cofre=[{id:1,salt,verificador}]; VAULT.key=key; vArm(); renderView(); toast('Cofre criado e desbloqueado','ok');
+  }catch(e){ erro(e); }
+  return false;
+}
+async function vUnlock(ev){
+  ev.preventDefault();
+  const c=S.db.cofre[0], btn=$('#v_btn'); btn.disabled=true;
+  try{ const key=await vDerive($('#v_pass').value,c.salt); if(await vDec(key,c.verificador)!==VERIF) throw 0; VAULT.key=key; vArm(); renderView(); toast('Cofre desbloqueado','ok'); }
+  catch(e){ toast('Senha do cofre incorreta','bad'); btn.disabled=false; $('#v_pass').select(); }
+  return false;
+}
+async function copiar(t){
+  try{ await navigator.clipboard.writeText(t); }
+  catch(e){ const a=document.createElement('textarea'); a.value=t; a.style.cssText='position:fixed;opacity:0;left:0;top:0'; document.body.appendChild(a); a.select(); document.execCommand('copy'); a.remove(); }
+}
+async function vCopy(id,campo){
+  const p=S.db.portais.find(x=>x.id===id); if(!p) return;
+  try{
+    if(campo==='usuario'){ await copiar(p.usuario||''); toast('Usuário copiado','ok'); return; }
+    if(!VAULT.key) return vNeed();
+    await copiar(await vDec(VAULT.key,p.senha_cifrada)); toast('Senha copiada','ok'); vArm();
+  }catch(e){ toast('Não foi possível ler esta senha','bad'); }
+}
+async function vToggle(id){
+  if(!VAULT.key) return vNeed();
+  const el=$('#pw_'+id), p=S.db.portais.find(x=>x.id===id);
+  if(VAULT.show.has(id)){ VAULT.show.delete(id); el.textContent='••••••••'; return; }
+  try{ el.textContent=await vDec(VAULT.key,p.senha_cifrada); VAULT.show.add(id); vArm(); }catch(e){ toast('Não foi possível ler esta senha','bad'); }
+}
+async function vReset(){
+  const t=prompt('Redefinir o cofre apaga a senha do cofre e TODAS as senhas guardadas. Nomes, links, usuários e observações continuam.\n\nPara confirmar, digite APAGAR:');
+  if((t||'').trim().toUpperCase()!=='APAGAR') return;
+  const {error:e1}=await sb.from('portais').update({senha_cifrada:null}).gt('id',0); if(e1) return erro(e1);
+  const {error:e2}=await sb.from('cofre').delete().eq('id',1); if(e2) return erro(e2);
+  VAULT.key=null; VAULT.show.clear(); await loadCad(); enrichAll(); renderView(); toast('Cofre redefinido. Crie uma nova senha do cofre.','ok');
+}
+const urlPortal=u=>!u?'':(/^https?:\/\//i.test(u)?u:'https://'+u);
+function pgPortais(){
+  VAULT.show.clear();
+  const q=S.port, b=norm(q.busca), H=byId(S.db.hospitais), C=byId(S.db.convenios), temCofre=S.db.cofre.length>0, on=!!VAULT.key;
+  const list=S.db.portais.filter(p=>(!q.hospital||String(p.hospital_id)===q.hospital)&&(!b||norm([p.nome,p.usuario,p.url,H.get(p.hospital_id)?.nome,C.get(p.convenio_id)?.nome,p.observacoes].join(' ')).includes(b))).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR'));
+  const vault=!temCofre
+    ? `<div class="card vault"><div class="ico">${ic('lock')}</div><div class="grow"><b>Crie a senha do cofre</b><div class="mut sm">As senhas dos portais são criptografadas no seu aparelho com esta senha antes de irem para o banco de dados. Nem quem administra o banco consegue lê-las. Guarde-a bem: se esquecer, as senhas salvas não têm como ser recuperadas.</div></div><form onsubmit="return vCreate(event)"><input class="inp sm" type="password" id="v_p1" placeholder="Senha do cofre (mín. 8)" autocomplete="new-password"><input class="inp sm" type="password" id="v_p2" placeholder="Repita a senha" autocomplete="new-password"><button class="btn pri sm">${ic('lock')}Criar cofre</button></form></div>`
+    : on
+    ? `<div class="card vault on"><div class="ico" style="background:rgba(52,211,153,.12);color:#6EE7B7">${ic('unlock')}</div><div class="grow"><b>Cofre desbloqueado</b><div class="mut sm">Bloqueia sozinho após 15 minutos sem uso ou quando a página é recarregada.</div></div><button class="btn gho sm" onclick="vLock()">${ic('lock')}Bloquear agora</button></div>`
+    : `<div class="card vault"><div class="ico">${ic('lock')}</div><div class="grow"><b>Cofre bloqueado</b><div class="mut sm">Digite a senha do cofre para ver e copiar as senhas. <a class="link" onclick="vReset()">Esqueci a senha do cofre</a></div></div><form onsubmit="return vUnlock(event)"><input class="inp sm" type="password" id="v_pass" placeholder="Senha do cofre" autocomplete="current-password"><button class="btn pri sm" id="v_btn">${ic('unlock')}Desbloquear</button></form></div>`;
+  const card=p=>{ const h=H.get(p.hospital_id)?.nome, c=C.get(p.convenio_id)?.nome, url=urlPortal(p.url);
+    return `<div class="pt"><div class="pt-h"><div><div class="pt-n">${esc(p.nome)}${p.demo?'<span class="tagdemo">DEMO</span>':''}</div><div class="pt-s">${esc([h,c].filter(Boolean).join(' · ')||'Sem hospital ou operadora vinculados')}</div></div><button class="ibtn sm" title="Editar" onclick="portalForm(${p.id})">${ic('edit')}</button></div>
+      <div class="cred"><span>Usuário</span><code>${p.usuario?esc(p.usuario):'<i>não cadastrado</i>'}</code>${p.usuario?`<button class="ibtn sm" title="Copiar usuário" onclick="vCopy(${p.id},'usuario')">${ic('copy')}</button>`:''}</div>
+      <div class="cred"><span>Senha</span><code id="pw_${p.id}">${p.senha_cifrada?'••••••••':'<i>não cadastrada</i>'}</code>${p.senha_cifrada?`<button class="ibtn sm" title="Mostrar / ocultar" onclick="vToggle(${p.id})">${ic('eye')}</button><button class="ibtn sm" title="Copiar senha" onclick="vCopy(${p.id},'senha')">${ic('copy')}</button>`:''}</div>
+      ${p.observacoes?`<div class="pt-o">${esc(p.observacoes)}</div>`:''}
+      ${url?`<a class="btn pri sm" href="${esc(url)}" target="_blank" rel="noopener noreferrer">${ic('ext')}Abrir portal</a>`:''}</div>`; };
+  const html=`
+  <div class="phead"><div><h1>Portais e logins</h1><p class="mut">Acessos aos portais dos hospitais e operadoras para acompanhar as autorizações.</p></div>
+    <button class="btn pri" onclick="portalForm(null)">${ic('plus')}Novo portal</button></div>
+  ${vault}
+  <div class="tool"><div class="search">${ic('search')}<input class="inp" placeholder="Buscar portal, usuário, hospital…" value="${esc(q.busca)}" oninput="S.port.busca=this.value;clearTimeout(window._pp);window._pp=setTimeout(()=>{renderView();const i=$('.tool .search input');i.focus();i.setSelectionRange(i.value.length,i.value.length)},250)"></div>
+    <select class="inp sm sel" onchange="S.port.hospital=this.value;renderView()">${opts(S.db.hospitais,q.hospital,'Hospital: todos')}</select></div>
+  ${list.length?`<div class="plist">${list.map(card).join('')}</div>`:`<div class="card empty">${S.db.portais.length?'Nenhum portal encontrado com esse filtro.':'Nenhum portal cadastrado ainda.'}<br><br><button class="btn pri sm" onclick="portalForm(null)">${ic('plus')}Cadastrar portal</button></div>`}`;
+  return {html};
+}
+function portalForm(id){
+  const p=id?S.db.portais.find(x=>x.id===id):{}, v=k=>esc(p[k]??''), on=!!VAULT.key, temCofre=S.db.cofre.length>0;
+  const senha = !temCofre ? `<div class="hint">Crie a senha do cofre na página de Portais para poder guardar senhas.</div>`
+    : !on ? `<div class="hint">${p.senha_cifrada?'Há uma senha guardada. ':''}Desbloqueie o cofre na página de Portais para ${p.senha_cifrada?'trocar':'cadastrar'} a senha.</div>`
+    : `<div class="selplus"><input class="inp" type="password" id="pf_senha" autocomplete="new-password" placeholder="${p.senha_cifrada?'Deixe em branco para manter a atual':'Senha do portal'}"><button type="button" class="ibtn" title="Mostrar" onclick="const i=$('#pf_senha');i.type=i.type==='password'?'text':'password'">${ic('eye')}</button></div>
+       ${p.senha_cifrada?`<label class="chk" style="margin-top:6px"><input type="checkbox" id="pf_limpar">Remover a senha guardada</label>`:''}`;
+  openModal(`<div class="mh"><div><div class="kick">Portais</div><h2>${id?'Editar portal':'Novo portal'}</h2></div><button class="ibtn" onclick="closeModal()">${ic('x')}</button></div>
+    <div class="fgrid">
+      <label class="f req full"><span>Nome do portal</span><input class="inp" id="pf_nome" value="${v('nome')}" placeholder="Ex.: Portal Unimed – Autorizações"></label>
+      <label class="f full"><span>Endereço (link)</span><input class="inp" id="pf_url" value="${v('url')}" placeholder="https://…" inputmode="url"></label>
+      <label class="f"><span>Hospital</span>${selPlus('hospital_id','hospitais',S.db.hospitais,p.hospital_id,'Nenhum')}</label>
+      <label class="f"><span>Operadora / convênio</span>${selPlus('convenio_id','convenios',S.db.convenios,p.convenio_id,'Nenhuma')}</label>
+      <label class="f"><span>Usuário / login</span><input class="inp" id="pf_usuario" value="${v('usuario')}" autocomplete="off"></label>
+      <label class="f"><span>Senha</span>${senha}</label>
+      <label class="f full"><span>Observações</span><textarea class="inp" id="pf_observacoes" placeholder="Ex.: código do prestador, contato do setor, horário de atendimento">${v('observacoes')}</textarea></label>
+    </div>
+    <div class="actions" style="justify-content:${id?'space-between':'flex-end'}">${id?`<button class="btn dan sm" onclick="portalDel(${id})">${ic('trash')}Excluir</button>`:''}<div style="display:flex;gap:8px"><button class="btn gho" onclick="closeModal()">Cancelar</button><button class="btn pri" id="pf_btn" onclick="portalSave(${id||'null'})">${ic('check')}Salvar</button></div></div>`,'portal',true);
+  setTimeout(()=>$('#pf_nome')?.focus(),60);
+}
+async function portalSave(id){
+  const g=k=>{ const v=($('#pf_'+k)?.value||'').trim(); return v||null; };
+  const row={nome:g('nome'),url:g('url'),usuario:g('usuario'),observacoes:g('observacoes'),hospital_id:Number($('#f_hospital_id').value)||null,convenio_id:Number($('#f_convenio_id').value)||null};
+  if(!row.nome) return toast('Informe o nome do portal','bad');
+  try{
+    const pw=$('#pf_senha')?.value;
+    if(pw){ if(!VAULT.key) return vNeed(); row.senha_cifrada=await vEnc(VAULT.key,pw); }
+    else if($('#pf_limpar')?.checked) row.senha_cifrada=null;
+    $('#pf_btn').disabled=true;
+    const {error}=id?await sb.from('portais').update(row).eq('id',id):await sb.from('portais').insert(row);
+    if(error) throw error;
+    closeModal(); S.db.portais=await fetchAll('portais'); renderView(); toast('Portal salvo','ok'); if(VAULT.key) vArm();
+  }catch(e){ erro(e); const b=$('#pf_btn'); if(b) b.disabled=false; }
+}
+async function portalDel(id){
+  if(!confirm('Excluir este portal e o login guardado?')) return;
+  const {error}=await sb.from('portais').delete().eq('id',id); if(error) return erro(error);
+  closeModal(); S.db.portais=await fetchAll('portais'); renderView(); toast('Portal excluído','ok');
 }
 
 /* =========================================================
