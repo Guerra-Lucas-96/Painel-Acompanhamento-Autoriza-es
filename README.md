@@ -1,54 +1,54 @@
-# Neurox · Painel de OPME
+# Autoriza OPME · Painel de Autorizações
 
-Painel de pedidos, autorizações e cirurgias de OPME, com ranking por vendedor e por médico, prazos em dias úteis, histórico de preços por convênio e relatórios em PDF.
+Painel de pedidos, autorizações e cirurgias de OPME. Reúne o acompanhamento por vendedor, por médico e por hospital, os prazos em dias úteis, o histórico de preços por convênio, os logins dos portais e os relatórios em PDF.
 
-- **Site:** um único arquivo `index.html`, publicado no GitHub Pages (gratuito)
+- **Endereço:** https://guerra-lucas-96.github.io/Painel-Acompanhamento-Autoriza-es/
+- **Site:** `index.html`, publicado no GitHub Pages (gratuito). Os ícones e o `manifest.webmanifest` permitem fixar o painel na tela do celular como um aplicativo.
 - **Banco de dados:** Supabase, projeto `neurox-painel-opme` (plano gratuito, região São Paulo)
-
-## Como publicar no GitHub Pages
-
-1. Entre no GitHub e clique em **New repository**. Nome sugerido: `neurox-painel`. Pode deixar como **Public**, porque os dados ficam no Supabase, protegidos por login, e não no código.
-2. Na página do repositório, clique em **Add file > Upload files**, envie o `index.html` e este `README.md`, e clique em **Commit changes**.
-3. Vá em **Settings > Pages**. Em *Source*, escolha **Deploy from a branch**, depois a branch **main** e a pasta **/ (root)**, e clique em **Save**.
-4. Em um ou dois minutos, o endereço aparece no topo da mesma página. Ele tem o formato `https://SEU-USUARIO.github.io/neurox-painel/`.
-
-## Primeiro acesso (faça isso antes de qualquer outra pessoa)
-
-1. Abra o endereço do site e clique em **Criar conta** com o seu e-mail.
-   **A primeira conta criada vira automaticamente a dona do painel.** Qualquer outra conta só enxerga os dados depois que você liberar o e-mail em **Cadastros > Acessos**.
-2. Confirme pelo link que chega no seu e-mail e depois entre com e-mail e senha.
-3. Ajuste recomendado no Supabase: abra o projeto **neurox-painel-opme** e vá em **Authentication > URL Configuration**. Em **Site URL**, coloque o endereço do GitHub Pages. Assim, os links de confirmação e de recuperação de senha voltam direto para o painel.
-
-## No celular
-
-Abra o endereço no navegador e use **Adicionar à tela de início** (no Safari, pelo botão Compartilhar; no Chrome, pelo menu ⋮). O painel abre como um aplicativo.
-
-## Como usar
-
-1. **Cadastros:** cadastre vendedores, médicos, convênios e hospitais. Os feriados nacionais, de Sergipe e de Aracaju de 2026 e 2027 já vêm cadastrados.
-2. **Novo processo:** informe o paciente, o vendedor, o médico, o convênio, o hospital e a data da solicitação. Em seguida, lance os itens com quantidade e valor unitário cotado.
-3. **Mover etapa:** use o fluxo Pedido → Cotação → Em análise (aguardando autorização) → Autorizada → Agendada → Realizada, ou marque como Negada ou Cancelada. Dá para informar a data e a hora reais da mudança.
-4. **Valores autorizados:** quando o processo for autorizado, preencha o valor unitário autorizado de cada item. Esses valores formam o histórico de preços por convênio, e o painel sugere o último valor aprovado na próxima cotação.
-5. **Filtros e PDF da lista:** em Processos, filtre por vendedor, médico, convênio e hospital. O botão **PDF** gera o acompanhamento exatamente da lista que está na tela.
-6. **Relatório semanal para o médico:** em Relatórios, escolha o médico (ou todos, e sai um PDF para cada um), o hospital e o período dos encerrados (padrão: últimos 7 dias). O PDF traz o status ao lado de cada paciente, os dias corridos desde a solicitação até a data do relatório, o tempo na etapa, a data da cirurgia, o nº da guia e o valor autorizado, com o total.
-7. **Portais:** guarde o link, o usuário e a senha dos portais de cada hospital e operadora. As senhas são criptografadas no seu aparelho com a **senha do cofre** antes de irem para o banco. Se você esquecer a senha do cofre, as senhas guardadas não têm como ser recuperadas: será preciso redefinir o cofre e cadastrá-las de novo.
-8. **Relatórios:** gere um PDF por vendedor ou um PDF consolidado para a diretoria. Há a opção de mostrar só as iniciais dos pacientes (LGPD). Também é possível exportar tudo em CSV para o Excel.
-
-## Dados de demonstração
-
-O banco começa com processos, médicos, hospitais e portais **fictícios**, marcados como demonstração. Enquanto eles existirem, aparece uma faixa amarela no topo do painel. Para começar de verdade, clique em **Apagar dados fictícios**. Só os dados de exemplo são removidos.
-
-## Prazos
-
-- O prazo de referência é de **21 dias úteis** contados da data da solicitação, sem contar fins de semana nem feriados cadastrados.
-- **Verde:** no prazo. **Amarelo:** a partir de 15 dias úteis. **Vermelho:** acima de 21 dias úteis.
-- Cada processo mostra o **tempo na etapa atual** e o **tempo total desde o pedido**.
-- Para mudar esses números, edite `PRAZO_DU` e `ALERTA_DU` no bloco `CONFIGURAÇÃO`, no início do script do `index.html`.
 
 ## Identidade visual
 
-As cores ficam no início do `<style>`, nas variáveis `--brand` (principal) e `--brand2` (secundária). Quando a paleta oficial e o logo da Neurox estiverem prontos, basta trocar esses valores e o SVG do logo, na função `logoSvg`.
+| Cor | Código | Uso |
+|---|---|---|
+| Azul-marinho profundo | `#17324D` | Textos, navegação e elementos de confiança |
+| Verde-petróleo | `#2FB7A6` | Ações, aprovação e estados positivos |
+| Amarelo-âmbar | `#F2B84B` | Destaques e pontos de atenção |
+| Fundo claro | `#F4F7F8` | Base neutra das telas |
+
+- **Tema:** o painel abre no tema claro. O botão de lua, no topo, alterna para o tema escuro.
+- **Logo:** é desenhado em vetor dentro do próprio `index.html` (constantes `LOGO_PARTS` e `LOGO_WORD`). Clicar nele volta para a tela inicial.
+- **Relógio:** fica no canto superior esquerdo, com data e hora.
+
+## Como usar
+
+1. **Cadastros:** cadastre vendedores, médicos, convênios e hospitais. Os hospitais de Aracaju já vêm cadastrados com CNPJ, e os feriados de 2026 e 2027 também.
+2. **Novo processo:** informe paciente, vendedor, médico, convênio, hospital e data da solicitação. Em seguida, lance os itens cotados.
+3. **Mover etapa:** o fluxo é Pedido → Cotação → Em análise → Autorizada → Agendada → Realizada, ou então Negada ou Cancelada.
+4. **Valores autorizados:** preencha o valor unitário autorizado de cada item. Esses valores formam o histórico de preços por convênio.
+5. **Processos:** filtre por vendedor, médico, convênio e hospital. O botão **PDF** gera o relatório exatamente da lista que está na tela.
+6. **Relatórios:** escolha **por vendedor**, **por médico** ou **por hospital**. Para um nome específico sai um PDF. Para "todos", sai um PDF para cada um.
+   - Todo PDF traz: paciente, médico, convênio, hospital, data da solicitação, tempo desde a solicitação até o dia do relatório e status.
+   - **Vendedor:** resumo por médico e por hospital, e depois os pacientes divididos por médico e, dentro de cada médico, por hospital.
+   - **Médico:** pacientes divididos por hospital.
+   - **Hospital:** pacientes divididos por médico.
+   - **Opções:** mostrar o valor autorizado, mostrar só as iniciais dos pacientes (LGPD) e escolher quais encerrados incluir.
+   - **Diretoria:** relatório gerencial com indicadores, funil, rankings, tempos por etapa e prazos vencidos.
+7. **Portais:** guarde o link, o usuário e a senha dos portais dos hospitais e operadoras. As senhas são criptografadas no aparelho com a **senha do cofre**. Se essa senha for esquecida, as senhas guardadas não têm como ser recuperadas.
+
+## Dados de demonstração
+
+Enquanto houver dados fictícios, aparece uma faixa amarela no topo do painel. Para começar de verdade, clique em **Apagar dados fictícios**. Só os exemplos são removidos.
+
+## Prazos
+
+- O prazo de referência é de **21 dias úteis** desde a solicitação, sem contar fins de semana nem feriados cadastrados.
+- **Verde:** no prazo. **Âmbar:** a partir de 15 dias úteis. **Vermelho:** acima de 21 dias úteis.
+- Os dois números podem ser ajustados em `PRAZO_DU` e `ALERTA_DU`, no bloco `CONFIGURAÇÃO` do `index.html`.
+
+## No celular
+
+Abra o endereço e use **Adicionar à Tela de Início** (no iPhone, pelo botão Compartilhar) ou **Adicionar à tela inicial** (no Android, pelo menu ⋮). Se o atalho já existia, apague-o e adicione de novo para ele pegar o ícone novo.
 
 ## Plano gratuito do Supabase
 
-No plano gratuito, o projeto é **pausado depois de 7 dias sem nenhum acesso**. Os dados não são perdidos: para reativar, entre em supabase.com, abra o projeto e clique em **Restore**. Usando o painel com frequência, isso não acontece.
+O projeto é pausado depois de 7 dias sem nenhum acesso. Para reativar, entre em supabase.com, abra o projeto e clique em **Restore**. Nenhum dado se perde.
